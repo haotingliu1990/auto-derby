@@ -23,7 +23,7 @@ LOGGER = logging.getLogger(__name__)
 class g:
     data_path: str = ""
     image_path: str = ""
-    prompt_disabled = False
+    prompt_disabled = True
 
     labels: Dict[Text, Text] = {}
 
@@ -234,7 +234,8 @@ def text(img: Image, *, threshold: float = 0.8) -> Text:
     cv_img = np.asarray(img.convert("L"))
     _, binary_img = cv2.threshold(cv_img, 0, 255, cv2.THRESH_OTSU)
 
-    contours, _ = cv2.findContours(binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+    contours, _ = cv2.findContours(
+        binary_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
 
     if len(contours) == 0:
         LOGGER.debug("ocr result is empty")
@@ -341,7 +342,8 @@ def text(img: Image, *, threshold: float = 0.8) -> Text:
         char_bbox = _union_bbox(char_bbox, bbox)
     _push_char()
 
-    cropped_char_img_list = [_crop_char(bbox, img) for (bbox, img) in char_img_list]
+    cropped_char_img_list = [_crop_char(bbox, img)
+                             for (bbox, img) in char_img_list]
 
     if os.getenv("DEBUG") == __name__:
         segmentation_img = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
@@ -357,7 +359,8 @@ def text(img: Image, *, threshold: float = 0.8) -> Text:
         cropped_chars_img = cv2.cvtColor(binary_img, cv2.COLOR_GRAY2BGR)
         for bbox, _ in cropped_char_img_list:
             l, t, r, b = bbox
-            cv2.rectangle(cropped_chars_img, (l, t), (r, b), (0, 0, 255), thickness=1)
+            cv2.rectangle(cropped_chars_img, (l, t),
+                          (r, b), (0, 0, 255), thickness=1)
         cv2.imshow("ocr input", cv_img)
         cv2.imshow("ocr binary", binary_img)
         cv2.imshow("ocr segmentation", segmentation_img)
