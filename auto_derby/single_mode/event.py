@@ -83,14 +83,7 @@ def reload_on_demand() -> None:
 
 
 def _prompt_choice(event_id: Text) -> int:
-    if g.prompt_disabled:
-        return 1
-    ans = ""
-    while ans not in ["1", "2", "3", "4", "5"]:
-        ans = terminal.prompt("Choose event option(1/2/3/4/5):")
-    ret = int(ans)
-    _set(event_id, ret)
-    return ret
+    return 1
 
 
 def get_choice(event_screen: Image) -> int:
@@ -98,8 +91,10 @@ def get_choice(event_screen: Image) -> int:
     b_img = np.zeros((event_screen.height, event_screen.width))
     event_name_bbox = rp.vector4((75, 155, 305, 180), 466)
     options_bbox = rp.vector4((50, 200, 400, 570), 466)
-    cv_event_name_img = np.asarray(event_screen.crop(event_name_bbox).convert("L"))
-    _, cv_event_name_img = cv2.threshold(cv_event_name_img, 220, 255, cv2.THRESH_TOZERO)
+    cv_event_name_img = np.asarray(
+        event_screen.crop(event_name_bbox).convert("L"))
+    _, cv_event_name_img = cv2.threshold(
+        cv_event_name_img, 220, 255, cv2.THRESH_TOZERO)
 
     l, t, r, b = event_name_bbox
     b_img[t:b, l:r] = cv_event_name_img
@@ -115,7 +110,8 @@ def get_choice(event_screen: Image) -> int:
     cv_options_img = 255 - cv_options_img
     cv_options_img *= option_mask
 
-    _, cv_options_img = cv2.threshold(cv_options_img, 128, 255, cv2.THRESH_BINARY)
+    _, cv_options_img = cv2.threshold(
+        cv_options_img, 128, 255, cv2.THRESH_BINARY)
 
     l, t, r, b = options_bbox
     b_img[t:b, l:r] = cv_options_img
